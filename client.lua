@@ -2,13 +2,13 @@
 local QBCore = exports['qb-core']:GetCoreObject()
 local notifyShown = false  -- Prevent spamming the notification prompt
 
+-- Money Washing Logic (remains unchanged)
 Citizen.CreateThread(function()
     while true do
         Citizen.Wait(0)
         local playerPed = PlayerPedId()
         local playerCoords = GetEntityCoords(playerPed)
         
-        -- Money Washing Section
         for _, loc in ipairs(Config.WashLocations) do
             local distance = #(playerCoords - loc)
             
@@ -18,7 +18,7 @@ Citizen.CreateThread(function()
             
             if distance < Config.InteractionDistance then
                 if not notifyShown then
-                    exports['za_notify']:ShowSubtitle("Press [ E ] to wash your money", 3000)
+                    exports['za_notify']:ShowSubtitle("Press [ E ] to wash your money", 2000)
                     notifyShown = true
                 end
 
@@ -35,41 +35,70 @@ Citizen.CreateThread(function()
                     function()  -- Cancel callback
                         exports['za_notify']:ShowSubtitle("Washing cancelled", 3000)
                     end)
-                    Citizen.Wait(2000)
+                    Citizen.Wait(2000) -- Prevent spamming
                 end
             else
                 notifyShown = false
             end
         end
+    end
+end)
+
+-- qb-target Teleport Integration
+Citizen.CreateThread(function()
+    for i, teleport in ipairs(Config.TeleportPoints) do
+        -- Create a target zone for the entrance
+        exports['qb-target']:AddCircleZone("teleport_entrance_"..i, teleport.entrance, 1.5, {
+            name = "teleport_entrance_"..i,
+            debugPoly = false,
+            useZ = true,
+        }, {
+            options = {
+                {
+                    event = "myteleport:enter",
+                    icon = "fas fa-sign-in-alt",
+                    label = "Enter",
+                    teleportId = i,  -- Pass an ID to reference the teleport pair
+                },
+            },
+            distance = 2.5,
+        })
         
-        -- Teleport Points Section
-        for _, teleport in ipairs(Config.TeleportPoints) do
-            -- Entrance Marker and Interaction
-            local entranceDistance = #(playerCoords - teleport.entrance)
-            if entranceDistance < Config.MarkerDrawDistance then
-                DrawMarker(1, teleport.entrance.x, teleport.entrance.y, teleport.entrance.z - 1.0, 0, 0, 0, 0, 0, 0, 1.0, 1.0, 1.0, 0, 0, 255, 100, false, true, 2, false, false, false, false)
-            end
+        -- Create a target zone for the exit
+        exports['qb-target']:AddCircleZone("teleport_exit_"..i, teleport.exit, 1.5, {
+            name = "teleport_exit_"..i,
+            debugPoly = false,
+            useZ = true,
+        }, {
+            options = {
+                {
+                    event = "myteleport:exit",
+                    icon = "fas fa-sign-out-alt",
+                    label = "Exit",
+                    teleportId = i,
+                },
+            },
+            distance = 2.5,
+        })
+    end
+end)
 
-            if entranceDistance < Config.InteractionDistance then
-                exports['za_notify']:ShowSubtitle("Press [ E ] to enter", 3000)
-                if IsControlJustPressed(0, 38) then
-                    SetEntityCoords(playerPed, teleport.exit.x, teleport.exit.y, teleport.exit.z)
-                end
-            end
-            
-            -- Exit Marker and Interaction
-            local exitDistance = #(playerCoords - teleport.exit)
-            if exitDistance < Config.MarkerDrawDistance then
-                DrawMarker(1, teleport.exit.x, teleport.exit.y, teleport.exit.z - 1.0, 0, 0, 0, 0, 0, 0, 1.0, 1.0, 1.0, 255, 0, 0, 100, false, true, 2, false, false, false, false)
-            end
+-- Teleport Event Handlers
+RegisterNetEvent('myteleport:enter', function(data)
+    local teleportId = data.teleportId
+    if teleportId and Config.TeleportPoints[teleportId] then
+         local exitCoords = Config.TeleportPoints[teleportId].exit
+         local playerPed = PlayerPedId()
+         SetEntityCoords(playerPed, exitCoords.x, exitCoords.y, exitCoords.z)
+    end
+end)
 
-            if exitDistance < Config.InteractionDistance then
-                exports['za_notify']:ShowSubtitle("Press [ E ] to exit", 3000)
-                if IsControlJustPressed(0, 38) then
-                    SetEntityCoords(playerPed, teleport.entrance.x, teleport.entrance.y, teleport.entrance.z)
-                end
-            end
-        end
+RegisterNetEvent('myteleport:exit', function(data)
+    local teleportId = data.teleportId
+    if teleportId and Config.TeleportPoints[teleportId] then
+         local entranceCoords = Config.TeleportPoints[teleportId].entrance
+         local playerPed = PlayerPedId()
+         SetEntityCoords(playerPed, entranceCoords.x, entranceCoords.y, entranceCoords.z)
     end
 end)
 
