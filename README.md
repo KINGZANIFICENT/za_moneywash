@@ -16,7 +16,7 @@ Place both the za_moneywash and za_notify folders into the [za] directory.
 
 In your server.cfg, add the following line to ensure the resource loads properly:
 
-ensure [za]
+```ensure [za]```
 -------------------------------------
 dependencies
 
