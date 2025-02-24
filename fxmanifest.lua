@@ -3,7 +3,7 @@ game 'gta5'
 
 description 'ZA Money Wash Script for QBCore'
 version '1.0.0'
-author 'Your Name'
+author 'KingZa'
 
 shared_scripts {
     'config.lua'
