@@ -21,7 +21,8 @@ In your server.cfg, add the following line to ensure the resource loads properly
 -------------------------------------
 dependencies
 
-```qb-core``
+```qb-core```
+
 ```za_notify```
 
 -------------------------------------
