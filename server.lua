@@ -1,4 +1,4 @@
--- server.lua
+
 
 local QBCore = exports['qb-core']:GetCoreObject()
 local debugMode = true  -- Set to false when done debugging
@@ -10,7 +10,7 @@ RegisterNetEvent("za_moneywash:attemptWash", function()
 
     local inventory = Player.PlayerData.items
     local totalMarked = 0
-    local removalItems = {}  -- To store slot and count info for removal
+    local removalItems = {}  
 
     if debugMode then
         print("---- Player Inventory Start ----")
@@ -22,8 +22,6 @@ RegisterNetEvent("za_moneywash:attemptWash", function()
         print("---- Player Inventory End ----")
     end
 
-    
-    -- Loop through the player's inventory to find markedbills
 for slot, item in pairs(inventory) do
     if item and item.name == "markedbills" and item.amount > 0 then
         local billValue = 0
@@ -53,17 +51,17 @@ end
 
 
     if totalMarked > 0 then
-        -- Assume Config.TaxRate is defined as a percentage (e.g., 10 for 10%)
+        
         local taxRate = Config.TaxRate or 10
         local taxAmount = math.floor(totalMarked * (taxRate / 100))
         local cleanedMoney = math.floor(totalMarked - taxAmount)
         
-        -- Remove all markedbills from the player's inventory
+        
         for _, removal in ipairs(removalItems) do
             Player.Functions.RemoveItem("markedbills", removal.count, removal.slot)
         end
         
-        -- Credit the cleaned money to the player's cash account
+        
         Player.Functions.AddMoney("cash", cleanedMoney, "moneywashed")
         
         TriggerClientEvent("QBCore:Notify", src, 

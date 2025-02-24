@@ -1,8 +1,7 @@
--- client.lua
-local QBCore = exports['qb-core']:GetCoreObject()
-local notifyShown = false  -- Prevent spamming the notification prompt
 
--- Money Washing Logic (remains unchanged)
+local QBCore = exports['qb-core']:GetCoreObject()
+local notifyShown = false  
+
 Citizen.CreateThread(function()
     while true do
         Citizen.Wait(0)
@@ -29,13 +28,13 @@ Citizen.CreateThread(function()
                         disableMouse = false,
                         disableCombat = true,
                     }, {}, {}, {}, 
-                    function()  -- Success callback
+                    function()   
                         TriggerServerEvent("za_moneywash:attemptWash")
                     end, 
-                    function()  -- Cancel callback
+                    function()  
                         exports['za_notify']:ShowSubtitle("Washing cancelled", 3000)
                     end)
-                    Citizen.Wait(2000) -- Prevent spamming
+                    Citizen.Wait(2000) 
                 end
             else
                 notifyShown = false
@@ -44,10 +43,9 @@ Citizen.CreateThread(function()
     end
 end)
 
--- qb-target Teleport Integration
+
 Citizen.CreateThread(function()
     for i, teleport in ipairs(Config.TeleportPoints) do
-        -- Create a target zone for the entrance
         exports['qb-target']:AddCircleZone("teleport_entrance_"..i, teleport.entrance, 1.5, {
             name = "teleport_entrance_"..i,
             debugPoly = false,
@@ -58,13 +56,12 @@ Citizen.CreateThread(function()
                     event = "myteleport:enter",
                     icon = "fas fa-sign-in-alt",
                     label = "Enter",
-                    teleportId = i,  -- Pass an ID to reference the teleport pair
+                    teleportId = i,  
                 },
             },
             distance = 2.5,
         })
         
-        -- Create a target zone for the exit
         exports['qb-target']:AddCircleZone("teleport_exit_"..i, teleport.exit, 1.5, {
             name = "teleport_exit_"..i,
             debugPoly = false,
@@ -83,7 +80,7 @@ Citizen.CreateThread(function()
     end
 end)
 
--- Teleport Event Handlers
+
 RegisterNetEvent('myteleport:enter', function(data)
     local teleportId = data.teleportId
     if teleportId and Config.TeleportPoints[teleportId] then

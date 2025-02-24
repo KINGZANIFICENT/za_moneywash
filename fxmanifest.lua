@@ -1,7 +1,7 @@
 fx_version 'cerulean'
 game 'gta5'
 
-description 'ZA Money Wash Script for QBCore'
+description 'KingZa Wash Script for QBCore'
 version '1.0.0'
 author 'KingZa'
 
@@ -18,5 +18,6 @@ server_scripts {
 }
 
 dependencies {
-    'qb-core'
+    'qb-core',
+    'za_notify'
 }
