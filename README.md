@@ -17,11 +17,14 @@ Place both the za_moneywash and za_notify folders into the [za] directory.
 In your server.cfg, add the following line to ensure the resource loads properly:
 
 ```ensure [za]```
+
 -------------------------------------
 dependencies
 
-qb-core
-za_notify
+```qb-core``
+```za_notify```
+
 -------------------------------------
+
 link to za_notify 
 (https://github.com/KINGZANIFICENT/za_notify)
